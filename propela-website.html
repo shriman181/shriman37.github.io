@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Propela — The Operating System for Food Businesses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet"/>
+<style>
+/* ─── TOKENS ─── */
+:root{
+  --cream:#F7F2E8;
+  --cream-2:#EDE6D6;
+  --forest:#1B3D2A;
+  --forest-2:#2A5940;
+  --terra:#C45826;
+  --terra-2:#E07040;
+  --sage:#6B8F58;
+  --wheat:#D4A84E;
+  --espresso:#130D06;
+  --warm:#5A4232;
+  --surface:#FFFFFF;
+  --border:rgba(27,61,42,.11);
+  --border-2:rgba(27,61,42,.2);
+  --r-sm:6px;
+  --r-md:12px;
+  --r-lg:20px;
+  --r-xl:32px;
+  --font-display:'Cormorant Garamond',Georgia,serif;
+  --font-body:'DM Sans',sans-serif;
+  --font-mono:'DM Mono',monospace;
+  --shadow-sm:0 1px 3px rgba(19,13,6,.07),0 1px 2px rgba(19,13,6,.05);
+  --shadow-md:0 4px 16px rgba(19,13,6,.08),0 2px 6px rgba(19,13,6,.05);
+  --shadow-lg:0 12px 40px rgba(19,13,6,.1),0 4px 12px rgba(19,13,6,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:var(--font-body);background:var(--cream);color:var(--espresso);line-height:1.6;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{text-decoration:none;color:inherit}
+button{font-family:var(--font-body);cursor:pointer;border:none;background:none}
+
+/* ─── GRAIN OVERLAY ─── */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:9999;opacity:.4;
+}
+
+/* ─── TYPOGRAPHY ─── */
+.display{font-family:var(--font-display);font-weight:300;line-height:1.1;letter-spacing:-.01em}
+.display-xl{font-size:clamp(3rem,5.5vw,5.5rem)}
+.display-lg{font-size:clamp(2.2rem,4vw,3.8rem)}
+.display-md{font-size:clamp(1.8rem,3vw,2.8rem)}
+.label{font-size:.7rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;opacity:.55}
+.body-lg{font-size:1.05rem;line-height:1.75;color:var(--warm)}
+.body-sm{font-size:.875rem;color:var(--warm);line-height:1.65}
+.mono{font-family:var(--font-mono);font-size:.8rem}
+
+/* ─── LAYOUT ─── */
+.container{max-width:1140px;margin:0 auto;padding:0 2rem}
+.section{padding:7rem 0}
+.section-sm{padding:5rem 0}
+
+/* ─── SCROLL PROGRESS ─── */
+#progress-bar{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--terra),var(--wheat));z-index:1001;width:0%;transition:width .1s linear}
+
+/* ─── NAV ─── */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;transition:background .3s,box-shadow .3s;padding:.75rem 0}
+nav.scrolled{background:rgba(247,242,232,.96);backdrop-filter:blur(14px);box-shadow:0 1px 0 var(--border)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:var(--font-display);font-size:1.6rem;font-weight:500;color:var(--forest);letter-spacing:-.02em;display:flex;align-items:center;gap:.5rem}
+.nav-logo .dot{width:7px;height:7px;border-radius:50%;background:var(--terra);margin-top:2px}
+.nav-links{display:flex;align-items:center;gap:2rem}
+.nav-links a{font-size:.875rem;color:var(--warm);font-weight:400;transition:color .2s}
+.nav-links a:hover{color:var(--forest)}
+.nav-cta{background:var(--forest);color:var(--cream);padding:.55rem 1.4rem;border-radius:40px;font-size:.875rem;font-weight:500;transition:background .2s,transform .15s}
+.nav-cta:hover{background:var(--forest-2);transform:translateY(-1px)}
+
+/* ─── HERO ─── */
+#hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;padding-top:6rem}
+.hero-bg{position:absolute;inset:0;z-index:0}
+.hero-mesh{position:absolute;inset:0;background:
+  radial-gradient(ellipse 70% 60% at 80% 30%,rgba(107,143,88,.12) 0%,transparent 60%),
+  radial-gradient(ellipse 50% 50% at 15% 70%,rgba(196,88,38,.08) 0%,transparent 55%),
+  radial-gradient(ellipse 60% 40% at 50% 90%,rgba(212,168,78,.1) 0%,transparent 50%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;opacity:.4}
+.hero-content{position:relative;z-index:1;max-width:760px}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:.6rem;background:rgba(27,61,42,.07);border:0.5px solid var(--border-2);padding:.4rem 1rem;border-radius:40px;margin-bottom:2rem}
+.hero-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--sage);animation:pulse 2.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.hero-title em{color:var(--terra);font-style:italic}
+.hero-sub{max-width:520px;margin:1.5rem 0 2.5rem;font-size:1.1rem;color:var(--warm);line-height:1.75}
+.hero-actions{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.btn-primary{background:var(--forest);color:var(--cream);padding:.75rem 2rem;border-radius:40px;font-size:.9rem;font-weight:500;display:inline-flex;align-items:center;gap:.5rem;transition:all .2s;box-shadow:0 4px 14px rgba(27,61,42,.25)}
+.btn-primary:hover{background:var(--forest-2);transform:translateY(-2px);box-shadow:0 6px 20px rgba(27,61,42,.3)}
+.btn-ghost{color:var(--forest);font-size:.9rem;font-weight:500;display:inline-flex;align-items:center;gap:.4rem;padding:.75rem 1.5rem;border:0.5px solid var(--border-2);border-radius:40px;transition:all .2s}
+.btn-ghost:hover{background:rgba(27,61,42,.05);border-color:var(--forest)}
+.btn-arrow{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:currentColor;transition:transform .2s}
+.btn-arrow svg{color:var(--cream)}
+.hero-stats{display:flex;gap:3rem;margin-top:4rem;padding-top:2.5rem;border-top:0.5px solid var(--border)}
+.stat-item .num{font-family:var(--font-display);font-size:2.4rem;font-weight:500;color:var(--forest);line-height:1}
+.stat-item .desc{font-size:.8rem;color:var(--warm);margin-top:.3rem;max-width:100px}
+
+/* ─── FLOATING FOOD ICONS ─── */
+.float-icons{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.fi{position:absolute;opacity:.07;animation:float 8s ease-in-out infinite}
+.fi:nth-child(1){top:15%;right:12%;animation-delay:0s;animation-duration:9s}
+.fi:nth-child(2){top:55%;right:6%;animation-delay:2s;animation-duration:11s}
+.fi:nth-child(3){top:30%;right:30%;animation-delay:4s;animation-duration:8s}
+.fi:nth-child(4){top:70%;right:22%;animation-delay:1s;animation-duration:10s}
+.fi:nth-child(5){top:10%;right:45%;animation-delay:3s;animation-duration:13s}
+@keyframes float{0%,100%{transform:translateY(0) rotate(0deg)}33%{transform:translateY(-18px) rotate(3deg)}66%{transform:translateY(8px) rotate(-2deg)}}
+
+/* ─── PAIN SECTION ─── */
+#pain{background:var(--forest);color:var(--cream)}
+#pain .section-title{color:var(--cream)}
+#pain .section-title em{color:var(--wheat);font-style:italic}
+.pain-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5px;margin-top:3.5rem;background:rgba(255,255,255,.08);border-radius:var(--r-lg);overflow:hidden}
+.pain-card{background:rgba(27,61,42,.5);padding:2.5rem;position:relative;overflow:hidden;transition:background .3s}
+.pain-card:hover{background:rgba(27,61,42,.7)}
+.pain-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--terra),transparent);opacity:0;transition:opacity .3s}
+.pain-card:hover::before{opacity:1}
+.pain-num{font-family:var(--font-display);font-size:4rem;font-weight:300;color:rgba(212,168,78,.18);position:absolute;top:.5rem;right:1.5rem;line-height:1}
+.pain-icon{width:42px;height:42px;border-radius:var(--r-sm);background:rgba(196,88,38,.18);display:flex;align-items:center;justify-content:center;margin-bottom:1.2rem}
+.pain-card h3{font-family:var(--font-display);font-size:1.4rem;font-weight:400;margin-bottom:.75rem;color:var(--cream)}
+.pain-card p{font-size:.875rem;color:rgba(247,242,232,.6);line-height:1.7}
+.pain-highlight{font-family:var(--font-display);font-size:1.7rem;font-weight:400;color:var(--wheat);display:block;margin-top:.75rem}
+
+/* ─── MODULES ─── */
+#modules{background:var(--cream)}
+.modules-intro{max-width:560px;margin-bottom:4rem}
+.modules-tabs{display:flex;gap:.5rem;margin-bottom:3rem;flex-wrap:wrap}
+.mod-tab{padding:.55rem 1.4rem;border-radius:40px;font-size:.875rem;font-weight:400;border:0.5px solid var(--border-2);color:var(--warm);transition:all .2s;cursor:pointer}
+.mod-tab.active,.mod-tab:hover{background:var(--forest);color:var(--cream);border-color:var(--forest)}
+.module-panel{display:none;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+.module-panel.active{display:grid}
+.mod-visual{background:var(--cream-2);border-radius:var(--r-lg);padding:2rem;border:0.5px solid var(--border);position:relative;overflow:hidden;min-height:340px}
+.mod-visual::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(107,143,88,.06) 0%,transparent 60%)}
+.mod-badge{display:inline-flex;align-items:center;gap:.5rem;background:var(--surface);border:0.5px solid var(--border);padding:.35rem .9rem;border-radius:40px;font-size:.75rem;font-weight:500;color:var(--forest);margin-bottom:1.5rem}
+.mod-kpi{background:var(--surface);border-radius:var(--r-md);padding:1rem 1.25rem;margin-top:1rem;border:0.5px solid var(--border)}
+.mod-kpi-val{font-family:var(--font-display);font-size:2rem;font-weight:400;color:var(--terra)}
+.mod-kpi-label{font-size:.75rem;color:var(--warm);margin-top:.15rem}
+.mod-features{list-style:none;margin-top:1.5rem}
+.mod-features li{font-size:.875rem;color:var(--warm);padding:.5rem 0;border-bottom:0.5px solid var(--border);display:flex;gap:.75rem;align-items:flex-start}
+.mod-features li::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--terra);flex-shrink:0;margin-top:.55rem}
+.mod-features li:last-child{border-bottom:none}
+.mod-info h3{font-family:var(--font-display);font-size:2rem;font-weight:400;margin-bottom:.75rem;color:var(--forest)}
+.mod-info p{font-size:.9rem;color:var(--warm);line-height:1.75;margin-bottom:1.5rem}
+.mod-tag-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.5rem}
+.mod-tag{background:rgba(27,61,42,.07);color:var(--forest);font-size:.75rem;padding:.3rem .75rem;border-radius:40px;font-weight:500}
+
+/* ─── MINI CHART in module visual ─── */
+.mini-chart{margin-top:1.25rem}
+.chart-bar-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem}
+.chart-label{font-size:.72rem;color:var(--warm);width:80px;text-align:right;flex-shrink:0}
+.chart-bar-wrap{flex:1;background:var(--border);border-radius:4px;height:8px;overflow:hidden}
+.chart-bar{height:100%;border-radius:4px;transition:width 1s cubic-bezier(.22,.61,.36,1)}
+.bar-terra{background:var(--terra)}
+.bar-sage{background:var(--sage)}
+.bar-wheat{background:var(--wheat)}
+.bar-forest{background:var(--forest-2)}
+.chart-val{font-size:.72rem;font-weight:500;color:var(--espresso);width:36px;flex-shrink:0}
+
+/* ─── FLOW / HOW IT WORKS ─── */
+#how{background:var(--cream-2);overflow:hidden}
+.flow-line{position:relative;margin-top:3.5rem}
+.flow-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
+.flow-steps::before{content:'';position:absolute;top:28px;left:12.5%;right:12.5%;height:0.5px;background:linear-gradient(90deg,var(--terra),var(--sage),var(--wheat),var(--forest));z-index:0}
+.flow-step{text-align:center;padding:0 1rem;position:relative;z-index:1}
+.flow-num{width:56px;height:56px;border-radius:50%;background:var(--surface);border:0.5px solid var(--border-2);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;font-family:var(--font-display);font-size:1.3rem;font-weight:400;color:var(--forest);position:relative;transition:all .3s}
+.flow-step:hover .flow-num{background:var(--forest);color:var(--cream);border-color:var(--forest);transform:scale(1.08)}
+.flow-step h4{font-family:var(--font-display);font-size:1.1rem;font-weight:400;color:var(--forest);margin-bottom:.4rem}
+.flow-step p{font-size:.8rem;color:var(--warm);line-height:1.65}
+
+/* ─── INTEGRATIONS ─── */
+.integrations-row{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-top:2rem}
+.integ-pill{display:flex;align-items:center;gap:.5rem;background:var(--surface);border:0.5px solid var(--border);padding:.4rem 1rem;border-radius:40px;font-size:.8rem;color:var(--warm);font-weight:400}
+.integ-dot{width:6px;height:6px;border-radius:50%}
+
+/* ─── ROI ─── */
+#roi{background:var(--cream)}
+.roi-split{display:grid;grid-template-columns:1fr 1.1fr;gap:4rem;align-items:center}
+.roi-metrics{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.roi-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r-lg);padding:1.5rem;transition:box-shadow .3s,transform .3s}
+.roi-card:hover{box-shadow:var(--shadow-md);transform:translateY(-3px)}
+.roi-val{font-family:var(--font-display);font-size:2.6rem;font-weight:400;line-height:1;color:var(--forest)}
+.roi-label{font-size:.8rem;color:var(--warm);margin-top:.4rem;line-height:1.4}
+.roi-visual{background:var(--forest);border-radius:var(--r-xl);padding:2.5rem;color:var(--cream);position:relative;overflow:hidden}
+.roi-visual::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(212,168,78,.1)}
+.roi-table{width:100%;border-collapse:collapse;font-size:.875rem}
+.roi-table tr{border-bottom:0.5px solid rgba(255,255,255,.1)}
+.roi-table tr:last-child{border-bottom:none}
+.roi-table td{padding:.75rem 0;color:rgba(247,242,232,.75)}
+.roi-table td:last-child{text-align:right;font-weight:500;font-family:var(--font-mono);font-size:.8rem}
+.roi-table .pos{color:var(--wheat)}
+.roi-table .neg{color:rgba(247,242,232,.45)}
+.roi-total{margin-top:1.25rem;padding-top:1.25rem;border-top:0.5px solid rgba(255,255,255,.2);display:flex;justify-content:space-between;align-items:center}
+.roi-total-label{font-family:var(--font-display);font-size:1.1rem;font-weight:400}
+.roi-total-val{font-family:var(--font-display);font-size:1.8rem;font-weight:400;color:var(--wheat)}
+
+/* ─── PRICING ─── */
+#pricing{background:var(--cream-2)}
+.pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:3.5rem;align-items:end}
+.price-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r-lg);padding:2rem;transition:all .25s;position:relative}
+.price-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-4px)}
+.price-card.featured{background:var(--forest);color:var(--cream);border-color:var(--forest);transform:translateY(-8px)}
+.price-card.featured:hover{transform:translateY(-12px)}
+.price-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--terra);color:var(--cream);font-size:.7rem;font-weight:500;padding:.3rem .9rem;border-radius:40px;white-space:nowrap}
+.price-tier{font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--warm);margin-bottom:.75rem}
+.price-card.featured .price-tier{color:rgba(247,242,232,.55)}
+.price-amount{font-family:var(--font-display);font-size:2.4rem;font-weight:400;color:var(--forest);line-height:1.1}
+.price-card.featured .price-amount{color:var(--cream)}
+.price-period{font-size:.8rem;color:var(--warm);margin-top:.2rem}
+.price-card.featured .price-period{color:rgba(247,242,232,.55)}
+.price-features{list-style:none;margin:1.5rem 0;font-size:.825rem}
+.price-features li{padding:.45rem 0;border-bottom:0.5px solid var(--border);display:flex;gap:.6rem;color:var(--warm)}
+.price-card.featured .price-features li{border-color:rgba(255,255,255,.12);color:rgba(247,242,232,.7)}
+.price-features li::before{content:'✓';color:var(--sage);flex-shrink:0;font-weight:500}
+.price-card.featured .price-features li::before{color:var(--wheat)}
+.price-features li:last-child{border-bottom:none}
+.price-btn{display:block;text-align:center;padding:.65rem;border-radius:40px;font-size:.875rem;font-weight:500;transition:all .2s;border:0.5px solid var(--border-2);color:var(--forest);margin-top:1.5rem}
+.price-card.featured .price-btn{background:var(--wheat);color:var(--espresso);border-color:var(--wheat)}
+.price-btn:hover{background:var(--forest);color:var(--cream);border-color:var(--forest)}
+.price-card.featured .price-btn:hover{background:var(--cream);color:var(--forest)}
+
+/* ─── FOUNDER ─── */
+#founder{background:var(--cream);overflow:hidden}
+.founder-inner{display:grid;grid-template-columns:1fr 1.3fr;gap:5rem;align-items:center}
+.founder-portrait{position:relative}
+.portrait-frame{width:320px;height:380px;border-radius:var(--r-xl);background:var(--cream-2);border:0.5px solid var(--border);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.portrait-initials{font-family:var(--font-display);font-size:6rem;font-weight:300;color:var(--forest);opacity:.18}
+.portrait-leaf{position:absolute;bottom:-20px;right:-20px;width:140px;height:140px;opacity:.12}
+.founder-badge-row{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.25rem}
+.founder-badge{background:rgba(27,61,42,.07);color:var(--forest);font-size:.75rem;padding:.3rem .85rem;border-radius:40px;font-weight:400;border:0.5px solid var(--border)}
+.founder-info .label{margin-bottom:.6rem;color:var(--terra)}
+.founder-name{font-family:var(--font-display);font-size:3rem;font-weight:300;color:var(--forest);line-height:1.15;margin-bottom:.5rem}
+.founder-title{font-size:.9rem;color:var(--warm);margin-bottom:2rem;font-style:italic;font-family:var(--font-display)}
+.founder-bio{font-size:.9rem;color:var(--warm);line-height:1.8;margin-bottom:2rem}
+.founder-quote{border-left:2px solid var(--terra);padding-left:1.25rem;margin:1.75rem 0;font-family:var(--font-display);font-size:1.25rem;font-weight:300;color:var(--forest);line-height:1.55;font-style:italic}
+.founder-social{display:flex;gap:.75rem;margin-top:2rem}
+.soc-btn{width:38px;height:38px;border-radius:50%;border:0.5px solid var(--border-2);display:flex;align-items:center;justify-content:center;color:var(--warm);transition:all .2s;font-size:.85rem}
+.soc-btn:hover{background:var(--forest);color:var(--cream);border-color:var(--forest)}
+
+/* ─── TICKER ─── */
+.ticker-wrap{background:var(--forest);padding:.75rem 0;overflow:hidden;border-top:0.5px solid rgba(255,255,255,.08);border-bottom:0.5px solid rgba(255,255,255,.08)}
+.ticker-track{display:flex;gap:0;animation:tick 28s linear infinite;width:max-content}
+.ticker-item{display:flex;align-items:center;gap:.5rem;padding:0 2.5rem;font-size:.8rem;color:rgba(247,242,232,.55);white-space:nowrap;border-right:0.5px solid rgba(255,255,255,.1)}
+.ticker-item strong{color:var(--wheat);font-family:var(--font-mono);font-size:.8rem}
+@keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* ─── CTA ─── */
+#cta{background:var(--forest);padding:7rem 0;text-align:center;position:relative;overflow:hidden}
+#cta::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(212,168,78,.1) 0%,transparent 65%);pointer-events:none}
+#cta .display{color:var(--cream)}
+#cta .display em{color:var(--wheat);font-style:italic}
+#cta p{color:rgba(247,242,232,.6);max-width:500px;margin:1.25rem auto 2.5rem;font-size:.95rem}
+.cta-actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+.btn-wheat{background:var(--wheat);color:var(--espresso);padding:.8rem 2rem;border-radius:40px;font-size:.9rem;font-weight:500;display:inline-flex;align-items:center;gap:.5rem;transition:all .2s;box-shadow:0 4px 16px rgba(212,168,78,.3)}
+.btn-wheat:hover{background:#e5ba5a;transform:translateY(-2px)}
+.btn-outline-light{color:rgba(247,242,232,.75);font-size:.9rem;font-weight:400;display:inline-flex;align-items:center;gap:.5rem;padding:.8rem 1.5rem;border:0.5px solid rgba(255,255,255,.2);border-radius:40px;transition:all .2s}
+.btn-outline-light:hover{color:var(--cream);border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.06)}
+
+/* ─── FOOTER ─── */
+footer{background:var(--espresso);color:rgba(247,242,232,.45);padding:3.5rem 0}
+.footer-inner{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem}
+.footer-logo{font-family:var(--font-display);font-size:1.8rem;font-weight:400;color:var(--cream);margin-bottom:.6rem}
+.footer-tagline{font-size:.8rem;line-height:1.65;color:rgba(247,242,232,.35);max-width:220px;margin-top:.35rem}
+.footer-col h5{font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:rgba(247,242,232,.3);margin-bottom:1rem}
+.footer-col a{display:block;font-size:.8rem;color:rgba(247,242,232,.45);margin-bottom:.5rem;transition:color .2s}
+.footer-col a:hover{color:var(--cream)}
+.footer-bottom{margin-top:3rem;padding-top:1.5rem;border-top:0.5px solid rgba(255,255,255,.07);display:flex;justify-content:space-between;align-items:center;font-size:.75rem}
+.footer-brand{color:rgba(247,242,232,.25)}
+
+/* ─── REVEAL ANIMATION ─── */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s cubic-bezier(.22,.61,.36,1),transform .7s cubic-bezier(.22,.61,.36,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-d1{transition-delay:.1s}
+.reveal-d2{transition-delay:.2s}
+.reveal-d3{transition-delay:.3s}
+.reveal-d4{transition-delay:.4s}
+
+/* ─── SECTION HEADERS ─── */
+.section-eyebrow{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem}
+.eyebrow-line{width:32px;height:0.5px;background:var(--terra)}
+.section-header{margin-bottom:.75rem}
+.section-sub{font-size:.95rem;color:var(--warm);line-height:1.75;max-width:520px;margin-top:.6rem}
+
+/* ─── LIVE COUNTER WIDGET ─── */
+.live-calc{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r-xl);padding:2.5rem;margin-top:3.5rem;position:relative;overflow:hidden}
+.live-calc::before{content:'LIVE MARGIN CALCULATOR';position:absolute;top:1rem;right:1.5rem;font-size:.65rem;letter-spacing:.14em;color:var(--terra);font-weight:500}
+.calc-row{display:flex;align-items:center;gap:1.5rem;margin-bottom:1.25rem;flex-wrap:wrap}
+.calc-label{font-size:.8rem;color:var(--warm);min-width:160px}
+.calc-slider{flex:1;min-width:180px;accent-color:var(--terra);height:4px;cursor:pointer}
+.calc-val{font-family:var(--font-mono);font-size:.85rem;color:var(--espresso);min-width:80px}
+.calc-result{background:linear-gradient(135deg,var(--forest),var(--forest-2));border-radius:var(--r-lg);padding:1.5rem 2rem;margin-top:.75rem;display:flex;align-items:center;justify-content:space-between}
+.calc-result-label{font-size:.8rem;color:rgba(247,242,232,.65)}
+.calc-result-val{font-family:var(--font-display);font-size:2.2rem;font-weight:400;color:var(--wheat)}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:900px){
+  .pain-grid{grid-template-columns:1fr}
+  .module-panel{grid-template-columns:1fr}
+  .flow-steps{grid-template-columns:1fr 1fr}
+  .flow-steps::before{display:none}
+  .roi-split{grid-template-columns:1fr}
+  .pricing-grid{grid-template-columns:1fr 1fr}
+  .price-card.featured{transform:none}
+  .founder-inner{grid-template-columns:1fr}
+  .footer-inner{grid-template-columns:1fr 1fr}
+  .hero-stats{flex-wrap:wrap;gap:1.5rem}
+}
+@media(max-width:600px){
+  .pricing-grid{grid-template-columns:1fr}
+  .roi-metrics{grid-template-columns:1fr}
+  .footer-inner{grid-template-columns:1fr}
+  .hero-stats{flex-direction:column;gap:1.25rem}
+  .calc-row{flex-direction:column;align-items:flex-start}
+  .calc-slider{width:100%}
+}
+</style>
+</head>
+<body>
+
+<!-- PROGRESS BAR -->
+<div id="progress-bar"></div>
+
+<!-- ─── NAV ─── -->
+<nav id="nav">
+  <div class="container">
+    <div class="nav-inner">
+      <a class="nav-logo" href="#hero">
+        <div class="dot"></div>Propela
+      </a>
+      <div class="nav-links">
+        <a href="#modules">Product</a>
+        <a href="#how">How it works</a>
+        <a href="#roi">ROI</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#founder">About</a>
+        <a href="#cta" class="nav-cta">Get early access</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section id="hero">
+  <div class="hero-bg">
+    <div class="hero-mesh"></div>
+    <div class="hero-grid"></div>
+    <!-- floating kitchen SVG motifs -->
+    <div class="float-icons">
+      <!-- Knife -->
+      <svg class="fi" style="width:80px" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 40 L36 8 L40 12 L14 42 Z" fill="var(--forest)"/><rect x="5" y="36" width="10" height="6" rx="2" fill="var(--warm)"/></svg>
+      <!-- Pan -->
+      <svg class="fi" style="width:100px" viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="28" cy="28" rx="22" ry="16" fill="var(--terra)"/><rect x="48" y="24" width="14" height="5" rx="2.5" fill="var(--warm)"/></svg>
+      <!-- Leaf -->
+      <svg class="fi" style="width:60px" viewBox="0 0 40 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 44 C20 44 4 32 4 18 C4 9 11 4 20 4 C29 4 36 9 36 18 C36 32 20 44 20 44Z" fill="var(--sage)"/><line x1="20" y1="8" x2="20" y2="44" stroke="white" stroke-width="1" opacity="0.4"/></svg>
+      <!-- Whisk -->
+      <svg class="fi" style="width:50px" viewBox="0 0 32 64" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="16" y1="2" x2="16" y2="20" stroke="var(--warm)" stroke-width="2"/><ellipse cx="16" cy="36" rx="12" ry="16" fill="none" stroke="var(--forest)" stroke-width="1.5"/><line x1="8" y1="20" x2="16" y2="52" stroke="var(--forest)" stroke-width="1"/><line x1="24" y1="20" x2="16" y2="52" stroke="var(--forest)" stroke-width="1"/></svg>
+      <!-- Chart bars (representing analytics) -->
+      <svg class="fi" style="width:70px" viewBox="0 0 56 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="28" width="10" height="16" rx="2" fill="var(--forest)" opacity=".6"/><rect x="18" y="16" width="10" height="28" rx="2" fill="var(--terra)" opacity=".6"/><rect x="32" y="8" width="10" height="36" rx="2" fill="var(--sage)" opacity=".6"/><rect x="46" y="20" width="6" height="24" rx="2" fill="var(--wheat)" opacity=".6"/></svg>
+    </div>
+  </div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <div class="hero-eyebrow-dot"></div>
+        <span class="mono" style="color:var(--forest);font-size:.75rem">AI platform for F&B operators</span>
+      </div>
+      <h1 class="display display-xl">
+        Every rupee of margin<br/>your kitchen <em>never sees.</em>
+      </h1>
+      <p class="hero-sub">Propela connects your POS, recipes, suppliers, and compliance into one AI layer — turning invisible margin leaks into recoverable profit, in real time.</p>
+      <div class="hero-actions">
+        <a href="#cta" class="btn-primary">
+          Request early access
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#modules" class="btn-ghost">See the product</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="num" id="s1">0</div>
+          <div class="desc">average food cost reduction in 90 days</div>
+        </div>
+        <div class="stat-item">
+          <div class="num" id="s2">0</div>
+          <div class="desc">menu gross margin improvement</div>
+        </div>
+        <div class="stat-item">
+          <div class="num" id="s3">0</div>
+          <div class="desc">procurement savings on avg per chain</div>
+        </div>
+        <div class="stat-item">
+          <div class="num" id="s4">0</div>
+          <div class="desc">ROI in the first year for a 5-outlet operator</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TICKER ─── -->
+<div class="ticker-wrap">
+  <div class="ticker-track" id="ticker">
+    <div class="ticker-item">RecipeIQ live · <strong>MCX Soybean ₹4,821/q</strong></div>
+    <div class="ticker-item">Onion APMC Mumbai · <strong>₹1,240/q</strong> <span style="color:#6B8F58">▲ 3.2%</span></div>
+    <div class="ticker-item">Sunflower Oil · <strong>₹1,085/10L</strong> <span style="color:#C45826">▼ 1.4%</span></div>
+    <div class="ticker-item">Propela customer · <strong>₹14.2L saved</strong> this quarter</div>
+    <div class="ticker-item">Chicken breast · <strong>₹268/kg</strong> <span style="color:#6B8F58">▲ 0.8%</span></div>
+    <div class="ticker-item">FSSAI compliance score avg · <strong>97.4%</strong> across active accounts</div>
+    <div class="ticker-item">Supplier benchmark · <strong>22 SKUs</strong> repriced today</div>
+    <div class="ticker-item">MenuOS · <strong>+₹18/plate</strong> margin unlocked for client in Delhi</div>
+    <!-- duplicate for seamless loop -->
+    <div class="ticker-item">RecipeIQ live · <strong>MCX Soybean ₹4,821/q</strong></div>
+    <div class="ticker-item">Onion APMC Mumbai · <strong>₹1,240/q</strong> <span style="color:#6B8F58">▲ 3.2%</span></div>
+    <div class="ticker-item">Sunflower Oil · <strong>₹1,085/10L</strong> <span style="color:#C45826">▼ 1.4%</span></div>
+    <div class="ticker-item">Propela customer · <strong>₹14.2L saved</strong> this quarter</div>
+    <div class="ticker-item">Chicken breast · <strong>₹268/kg</strong> <span style="color:#6B8F58">▲ 0.8%</span></div>
+    <div class="ticker-item">FSSAI compliance score avg · <strong>97.4%</strong> across active accounts</div>
+    <div class="ticker-item">Supplier benchmark · <strong>22 SKUs</strong> repriced today</div>
+    <div class="ticker-item">MenuOS · <strong>+₹18/plate</strong> margin unlocked for client in Delhi</div>
+  </div>
+</div>
+
+<!-- ─── PAIN ─── -->
+<section id="pain" class="section">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-eyebrow"><div class="eyebrow-line" style="background:var(--wheat)"></div><span class="label" style="color:rgba(247,242,232,.45)">The real cost of doing nothing</span></div>
+      <h2 class="display display-lg section-header" style="color:var(--cream)">Your kitchen runs on <em>guesswork.</em><br/>We run it on data.</h2>
+    </div>
+    <div class="pain-grid">
+      <div class="pain-card reveal reveal-d1">
+        <div class="pain-num">01</div>
+        <div class="pain-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--terra-2)" stroke-width="1.5"><path d="M9 14l2 2 4-4"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+        </div>
+        <h3>Recipe costs updated weekly,<br/>commodity prices change daily</h3>
+        <p>73% of F&B operators have no real-time recipe costing. By the time the spreadsheet is updated, the onion price has already eaten your margin.</p>
+        <span class="pain-highlight">₹18–30L lost annually</span>
+        <p style="font-size:.75rem;color:rgba(247,242,232,.35);margin-top:.3rem">per 300-seat restaurant, invisible food cost variance</p>
+      </div>
+      <div class="pain-card reveal reveal-d2">
+        <div class="pain-num">02</div>
+        <div class="pain-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--terra-2)" stroke-width="1.5"><path d="M3 3h18v4H3zM3 10h18v4H3zM3 17h18v4H3z"/></svg>
+        </div>
+        <h3>Menu decisions made by gut,<br/>not by margin and volume data</h3>
+        <p>Fewer than 30% of chains run any formal menu engineering process. The dish that feels popular might be your worst-performing item by contribution margin.</p>
+        <span class="pain-highlight">15–22% margin improvement</span>
+        <p style="font-size:.75rem;color:rgba(247,242,232,.35);margin-top:.3rem">unlocked in 60 days with data-driven menu engineering</p>
+      </div>
+      <div class="pain-card reveal reveal-d3">
+        <div class="pain-num">03</div>
+        <div class="pain-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--terra-2)" stroke-width="1.5"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        </div>
+        <h3>Suppliers hold all the leverage.<br/>Operators pay 18–40% over market.</h3>
+        <p>Without live MCX/APMC benchmarks and peer pricing data, every negotiation is one-sided. You don't know what you don't know — and it costs you every month.</p>
+        <span class="pain-highlight">₹2–5L/month overpaid</span>
+        <p style="font-size:.75rem;color:rgba(247,242,232,.35);margin-top:.3rem">by an average 5-outlet chain on procurement alone</p>
+      </div>
+      <div class="pain-card reveal reveal-d4">
+        <div class="pain-num">04</div>
+        <div class="pain-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--terra-2)" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3>Paper-based compliance that's<br/>always reactive, never preventive</h3>
+        <p>FSSAI fines up to ₹10L per violation. One media-covered incident costs 10× more in brand damage. A paper binder doesn't prevent — it just documents what already went wrong.</p>
+        <span class="pain-highlight">₹10L per violation</span>
+        <p style="font-size:.75rem;color:rgba(247,242,232,.35);margin-top:.3rem">FSSAI fine ceiling — before the reputational damage multiplier</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── MODULES ─── -->
+<section id="modules" class="section">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-eyebrow"><div class="eyebrow-line"></div><span class="label">Four modules. One platform.</span></div>
+      <h2 class="display display-lg section-header">Every margin lever,<br/>connected and <em>alive.</em></h2>
+      <p class="section-sub">Each module feeds data to the others. RecipeIQ costs change when MCX moves. MenuOS re-ranks when POS shifts. SupplierIQ alerts when commodity benchmarks diverge from your invoice. They are not tools — they are a system.</p>
+    </div>
+
+    <div style="margin-top:2.5rem">
+      <div class="modules-tabs">
+        <button class="mod-tab active" onclick="switchModule('recipe',this)">RecipeIQ</button>
+        <button class="mod-tab" onclick="switchModule('menu',this)">MenuOS</button>
+        <button class="mod-tab" onclick="switchModule('supplier',this)">SupplierIQ</button>
+        <button class="mod-tab" onclick="switchModule('safety',this)">SafeShield</button>
+      </div>
+
+      <!-- RecipeIQ -->
+      <div class="module-panel active" id="mod-recipe">
+        <div class="mod-visual reveal">
+          <div class="mod-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--forest)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Live · updating every 15 min
+          </div>
+          <div style="font-size:.72rem;color:var(--warm);margin-bottom:1rem;font-weight:500;letter-spacing:.06em">FOOD COST VARIANCE — BUTTER CHICKEN MASALA</div>
+          <div class="mini-chart">
+            <div class="chart-bar-row"><span class="chart-label">Chicken breast</span><div class="chart-bar-wrap"><div class="chart-bar bar-terra" style="width:0%" data-w="68%"></div></div><span class="chart-val">34%</span></div>
+            <div class="chart-bar-row"><span class="chart-label">Spice blend</span><div class="chart-bar-wrap"><div class="chart-bar bar-sage" style="width:0%" data-w="18%"></div></div><span class="chart-val">9%</span></div>
+            <div class="chart-bar-row"><span class="chart-label">Dairy (cream)</span><div class="chart-bar-wrap"><div class="chart-bar bar-wheat" style="width:0%" data-w="28%"></div></div><span class="chart-val">14%</span></div>
+            <div class="chart-bar-row"><span class="chart-label">Oil / ghee</span><div class="chart-bar-wrap"><div class="chart-bar bar-forest" style="width:0%" data-w="16%"></div></div><span class="chart-val">8%</span></div>
+          </div>
+          <div class="mod-kpi">
+            <div class="mod-kpi-val">31.4%</div>
+            <div class="mod-kpi-label">current food cost ratio · target: ≤28%  <span style="color:var(--terra)">↑ alert: chicken +4.2% MCX</span></div>
+          </div>
+        </div>
+        <div class="mod-info reveal reveal-d2">
+          <span class="label" style="color:var(--terra)">Module 01</span>
+          <h3>RecipeIQ</h3>
+          <p>Your entire recipe library, priced in real time against live commodity feeds. The moment MCX moves or APMC updates, every dish cost recalculates automatically — and you receive a margin alert before the invoice arrives.</p>
+          <ul class="mod-features">
+            <li>Live recipe costing linked to MCX/APMC commodity price feeds</li>
+            <li>Theoretical vs. actual food cost variance (POS-integrated)</li>
+            <li>Yield percentage tracker — accounts for prep waste and portioning loss</li>
+            <li>AI ingredient substitution engine: 96% flavour-match scoring</li>
+            <li>Batch scaling, allergen flags, FSSAI labelling-ready nutrition profiles</li>
+          </ul>
+          <div class="mod-tag-row">
+            <span class="mod-tag">Petpooja</span><span class="mod-tag">Posist</span><span class="mod-tag">MCX feed</span><span class="mod-tag">APMC</span><span class="mod-tag">Tally</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MenuOS -->
+      <div class="module-panel" id="mod-menu">
+        <div class="mod-visual reveal">
+          <div class="mod-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--forest)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+            Menu BCG Matrix · updated daily
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.5rem">
+            <div style="background:rgba(107,143,88,.12);border-radius:var(--r-md);padding:1rem;border:0.5px solid rgba(107,143,88,.25)">
+              <div style="font-size:.65rem;font-weight:500;color:var(--sage);letter-spacing:.08em;margin-bottom:.75rem">⭐ STARS</div>
+              <div style="font-size:.8rem;color:var(--forest);line-height:1.8">Dal Makhani<br/>Paneer Tikka<br/>Butter Naan</div>
+            </div>
+            <div style="background:rgba(212,168,78,.1);border-radius:var(--r-md);padding:1rem;border:0.5px solid rgba(212,168,78,.25)">
+              <div style="font-size:.65rem;font-weight:500;color:var(--wheat);letter-spacing:.08em;margin-bottom:.75rem">🐄 PLOWHORSES</div>
+              <div style="font-size:.8rem;color:var(--forest);line-height:1.8">Veg Biryani<br/>Raita<br/>Gulab Jamun</div>
+            </div>
+            <div style="background:rgba(196,88,38,.08);border-radius:var(--r-md);padding:1rem;border:0.5px solid rgba(196,88,38,.18)">
+              <div style="font-size:.65rem;font-weight:500;color:var(--terra);letter-spacing:.08em;margin-bottom:.75rem">❓ PUZZLES</div>
+              <div style="font-size:.8rem;color:var(--forest);line-height:1.8">Mutton Rogan Josh<br/>Prawn Masala</div>
+            </div>
+            <div style="background:rgba(90,66,50,.07);border-radius:var(--r-md);padding:1rem;border:0.5px solid rgba(90,66,50,.12)">
+              <div style="font-size:.65rem;font-weight:500;color:var(--warm);letter-spacing:.08em;margin-bottom:.75rem">🐕 DOGS</div>
+              <div style="font-size:.8rem;color:var(--forest);line-height:1.8">Club Sandwich<br/>French Fries</div>
+            </div>
+          </div>
+          <div class="mod-kpi" style="margin-top:.75rem">
+            <div class="mod-kpi-val">+₹22/cover</div>
+            <div class="mod-kpi-label">recommended margin improvement via 3 menu changes</div>
+          </div>
+        </div>
+        <div class="mod-info reveal reveal-d2">
+          <span class="label" style="color:var(--terra)">Module 02</span>
+          <h3>MenuOS</h3>
+          <p>Prescriptive menu engineering powered by your live POS data and recipe margins. Propela automatically classifies every dish, models price elasticity, and tells you exactly which items to push, reprice, redesign, or retire — before you make a single change.</p>
+          <ul class="mod-features">
+            <li>Auto BCG matrix from live POS + recipe margin data — refreshed daily</li>
+            <li>Price elasticity modelling — quantifies revenue impact before any change</li>
+            <li>Menu psychology engine: placement, anchoring, and description scoring</li>
+            <li>Seasonal planning with 3-month commodity price signals</li>
+            <li>What-if margin calculator and cross-outlet benchmarking</li>
+          </ul>
+          <div class="mod-tag-row">
+            <span class="mod-tag">POS integration</span><span class="mod-tag">Elasticity model</span><span class="mod-tag">BCG auto-classify</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SupplierIQ -->
+      <div class="module-panel" id="mod-supplier">
+        <div class="mod-visual reveal">
+          <div class="mod-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--forest)" stroke-width="1.5"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            Supplier intelligence · live benchmarks
+          </div>
+          <div style="font-size:.72rem;color:var(--warm);margin-bottom:.75rem;font-weight:500;letter-spacing:.06em">WHAT YOU PAY vs. MARKET — SUNFLOWER OIL 15L</div>
+          <div style="display:flex;flex-direction:column;gap:.6rem;margin-top:.5rem">
+            <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(196,88,38,.08);border-radius:var(--r-sm);padding:.6rem .875rem;border:0.5px solid rgba(196,88,38,.18)">
+              <span style="font-size:.8rem;color:var(--warm)">Your current rate · Sharma Traders</span>
+              <span style="font-family:var(--font-mono);font-size:.85rem;color:var(--terra);font-weight:500">₹1,340</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(107,143,88,.09);border-radius:var(--r-sm);padding:.6rem .875rem;border:0.5px solid rgba(107,143,88,.22)">
+              <span style="font-size:.8rem;color:var(--warm)">MCX spot + APMC avg benchmark</span>
+              <span style="font-family:var(--font-mono);font-size:.85rem;color:var(--sage);font-weight:500">₹1,085</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(212,168,78,.09);border-radius:var(--r-sm);padding:.6rem .875rem">
+              <span style="font-size:.8rem;color:var(--warm)">Peer avg (8 similar restaurants)</span>
+              <span style="font-family:var(--font-mono);font-size:.85rem;color:var(--wheat);font-weight:500">₹1,150</span>
+            </div>
+          </div>
+          <div class="mod-kpi">
+            <div class="mod-kpi-val">23.5% above</div>
+            <div class="mod-kpi-label">market · Propela AI counter-offer brief ready to send · <strong style="color:var(--sage)">save ₹2.1L/yr</strong></div>
+          </div>
+        </div>
+        <div class="mod-info reveal reveal-d2">
+          <span class="label" style="color:var(--terra)">Module 03</span>
+          <h3>SupplierIQ</h3>
+          <p>For the first time, you negotiate with data. SupplierIQ overlays your supplier invoices with live MCX/APMC benchmarks and anonymised peer pricing, then generates an AI negotiation brief — complete with counter-offer scripts — before your next call.</p>
+          <ul class="mod-features">
+            <li>Supplier price history with live MCX/APMC benchmark overlay</li>
+            <li>Anonymised peer-restaurant ratings: price, delivery, quality (rolling 90 days)</li>
+            <li>AI negotiation brief generator with counter-offer scripts and spot data</li>
+            <li>Demand forecasting → automated purchase order generation</li>
+            <li>Vendor scorecard and contract lifecycle management</li>
+          </ul>
+          <div class="mod-tag-row">
+            <span class="mod-tag">MCX live</span><span class="mod-tag">APMC</span><span class="mod-tag">Peer benchmarks</span><span class="mod-tag">AI briefs</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SafeShield -->
+      <div class="module-panel" id="mod-safety">
+        <div class="mod-visual reveal">
+          <div class="mod-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--forest)" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            FSSAI compliance · automated
+          </div>
+          <div style="font-size:.72rem;color:var(--warm);margin-bottom:.75rem;font-weight:500;letter-spacing:.06em">TODAY'S COMPLIANCE DASHBOARD</div>
+          <div style="display:flex;flex-direction:column;gap:.5rem">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:.6rem 0;border-bottom:0.5px solid var(--border)">
+              <span style="font-size:.8rem;color:var(--warm)">Cold storage temp · Walk-in A</span>
+              <span style="font-family:var(--font-mono);font-size:.8rem;color:var(--sage);font-weight:500">3.2°C ✓</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:.6rem 0;border-bottom:0.5px solid var(--border)">
+              <span style="font-size:.8rem;color:var(--warm)">Morning HACCP checklist</span>
+              <span style="font-family:var(--font-mono);font-size:.8rem;color:var(--sage);font-weight:500">7/7 ✓</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:.6rem 0;border-bottom:0.5px solid var(--border)">
+              <span style="font-size:.8rem;color:var(--warm)">FIFO expiry alerts</span>
+              <span style="font-family:var(--font-mono);font-size:.8rem;color:var(--wheat);font-weight:500">2 items today</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:.6rem 0">
+              <span style="font-size:.8rem;color:var(--warm)">FSSAI licence renewal</span>
+              <span style="font-family:var(--font-mono);font-size:.8rem;color:var(--warm)">47 days out ·</span>
+            </div>
+          </div>
+          <div class="mod-kpi">
+            <div class="mod-kpi-val">97.4%</div>
+            <div class="mod-kpi-label">compliance score · 0 open violations across all Propela accounts</div>
+          </div>
+        </div>
+        <div class="mod-info reveal reveal-d2">
+          <span class="label" style="color:var(--terra)">Module 04</span>
+          <h3>SafeShield</h3>
+          <p>Compliance that runs itself. SafeShield digitises your entire HACCP workflow, integrates with IoT temperature sensors, and keeps your team audit-ready every single day — automatically. The first time you're ever ahead of a regulator, not behind one.</p>
+          <ul class="mod-features">
+            <li>Digital HACCP plan builder with CCP monitoring and corrective action logging</li>
+            <li>IoT temperature sensor integration: auto-log every 15 min, breach alerts</li>
+            <li>FSSAI/FDA/ISO 22000 checklist automation via mobile in under 2 minutes</li>
+            <li>FIFO enforcement with barcode-based expiry tracking and waste logging</li>
+            <li>FSSAI regulatory update push notifications — never miss a rule change</li>
+          </ul>
+          <div class="mod-tag-row">
+            <span class="mod-tag">FSSAI DB</span><span class="mod-tag">IoT sensors</span><span class="mod-tag">HACCP</span><span class="mod-tag">ISO 22000</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── HOW IT WORKS ─── -->
+<section id="how" class="section-sm">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-eyebrow"><div class="eyebrow-line"></div><span class="label">Getting started in 72 hours</span></div>
+      <h2 class="display display-md section-header">Live in a weekend.<br/><em>Savings from week one.</em></h2>
+    </div>
+    <div class="flow-line reveal">
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-num">01</div>
+          <h4>Connect your POS</h4>
+          <p>One-click integration with Petpooja, Posist, GOFRUGAL, or SilverTouch. No data migration. No CSV uploads.</p>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">02</div>
+          <h4>Import your recipes</h4>
+          <p>Upload your existing recipe cards or let Propela auto-import from your POS item library. AI normalises everything.</p>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">03</div>
+          <h4>Add your suppliers</h4>
+          <p>Enter your current supplier list and last invoice prices. Propela immediately benchmarks them against live market data.</p>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">04</div>
+          <h4>Start saving</h4>
+          <p>Your first margin alert, negotiation brief, and menu recommendation arrive within 24 hours of going live.</p>
+        </div>
+      </div>
+    </div>
+    <div class="reveal" style="margin-top:3rem">
+      <p class="label" style="margin-bottom:.75rem">Native integrations</p>
+      <div class="integrations-row">
+        <div class="integ-pill"><span class="integ-dot" style="background:var(--terra)"></span>Petpooja</div>
+        <div class="integ-pill"><span class="integ-dot" style="background:var(--sage)"></span>Posist</div>
+        <div class="integ-pill"><span class="integ-dot" style="background:var(--wheat)"></span>GOFRUGAL</div>
+        <div class="integ-pill"><span class="integ-dot" style="background:var(--forest)"></span>SilverTouch</div>
+        <div class="integ-pill"><span class="integ-dot" style="background:var(--terra)"></span>Tally</div>
+        <div class="integ-pill"><span class="integ-dot" style="background:var(--sage)"></span>Zoho Books</div>
+        <div class="integ-pill"><span class="integ-dot" style="background:var(--wheat)"></span>MCX live</div>
+        <div class="integ-pill"><span class="integ-dot" style="background:var(--forest)"></span>APMC</div>
+        <div class="integ-pill"><span class="integ-dot" style="background:var(--terra)"></span>FSSAI DB</div>
+        <div class="integ-pill"><span class="integ-dot" style="background:var(--sage)"></span>IoT sensors</div>
+        <div class="integ-pill"><span class="integ-dot" style="background:var(--wheat)"></span>REST API</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── ROI ─── -->
+<section id="roi" class="section">
+  <div class="container">
+    <div class="roi-split">
+      <div>
+        <div class="reveal">
+          <div class="section-eyebrow"><div class="eyebrow-line"></div><span class="label">The business case</span></div>
+          <h2 class="display display-md section-header">₹17.96L returned<br/>in year one — for a<br/><em>5-outlet chain.</em></h2>
+          <p class="section-sub" style="margin-top:1rem">Propela costs ₹2.04L per year for a Studio account. The average 5-location chain recovers ₹19–22L in the same period. The subscription pays for itself in under 5 weeks.</p>
+        </div>
+        <div class="roi-metrics reveal reveal-d1" style="margin-top:2rem">
+          <div class="roi-card">
+            <div class="roi-val">8.8×</div>
+            <div class="roi-label">first-year ROI<br/>for Studio tier</div>
+          </div>
+          <div class="roi-card">
+            <div class="roi-val">3.5 mo</div>
+            <div class="roi-label">CAC payback<br/>period</div>
+          </div>
+          <div class="roi-card">
+            <div class="roi-val">76%</div>
+            <div class="roi-label">gross margin<br/>software delivery</div>
+          </div>
+          <div class="roi-card">
+            <div class="roi-val">&lt;1.5%</div>
+            <div class="roi-label">monthly churn<br/>(category avg 2–3%)</div>
+          </div>
+        </div>
+
+        <!-- LIVE MARGIN CALCULATOR -->
+        <div class="live-calc reveal reveal-d2">
+          <p style="font-size:.8rem;color:var(--warm);margin-bottom:1.25rem">Drag the sliders to model your own savings.</p>
+          <div class="calc-row">
+            <span class="calc-label">Monthly revenue (₹ lakhs)</span>
+            <input class="calc-slider" type="range" min="5" max="200" value="50" id="rev-slider" step="1"/>
+            <span class="calc-val" id="rev-val">₹50L</span>
+          </div>
+          <div class="calc-row">
+            <span class="calc-label">Number of outlets</span>
+            <input class="calc-slider" type="range" min="1" max="20" value="5" id="out-slider" step="1"/>
+            <span class="calc-val" id="out-val">5</span>
+          </div>
+          <div class="calc-result">
+            <div>
+              <div class="calc-result-label">Estimated annual savings with Propela</div>
+            </div>
+            <div class="calc-result-val" id="calc-result">₹18.9L</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="roi-visual reveal reveal-d2">
+        <p class="label" style="color:rgba(212,168,78,.55);margin-bottom:1.25rem">5-outlet Studio · annual P&L impact</p>
+        <table class="roi-table">
+          <tr><td>Propela subscription</td><td class="neg">−₹2.04L</td></tr>
+          <tr><td>Food cost saving via RecipeIQ<br/><span style="font-size:.72rem;opacity:.45">1% improvement · ₹1.5Cr × 5 outlets</span></td><td class="pos">+₹7.5L</td></tr>
+          <tr><td>Procurement saving via SupplierIQ<br/><span style="font-size:.72rem;opacity:.45">10% on ₹1Cr procurement spend</span></td><td class="pos">+₹10L</td></tr>
+          <tr><td>Compliance fine avoidance<br/><span style="font-size:.72rem;opacity:.45">1 FSSAI event prevented</span></td><td class="pos">+₹2.5L</td></tr>
+          <tr><td>Menu margin lift via MenuOS<br/><span style="font-size:.72rem;opacity:.45">conservative +1% contribution</span></td><td class="pos">+₹1.9L</td></tr>
+        </table>
+        <div class="roi-total">
+          <span class="roi-total-label">Net annual return</span>
+          <span class="roi-total-val">+₹19.86L</span>
+        </div>
+        <p style="font-size:.75rem;color:rgba(247,242,232,.3);margin-top:1rem;line-height:1.5">Conservative estimates. Actual recovery varies by operation. Customer keeps 86% of recovered margin after subscription.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PRICING ─── -->
+<section id="pricing" class="section-sm">
+  <div class="container">
+    <div class="reveal" style="text-align:center;max-width:500px;margin:0 auto 0">
+      <div class="section-eyebrow" style="justify-content:center"><div class="eyebrow-line"></div><span class="label">Simple, honest pricing</span><div class="eyebrow-line"></div></div>
+      <h2 class="display display-md">One platform.<br/><em>Four tiers.</em></h2>
+      <p class="section-sub" style="margin:1rem auto 0">No per-user pricing. No feature gating that makes the product useless. Every tier includes onboarding, integrations, and live commodity data.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card reveal reveal-d1">
+        <p class="price-tier">Solo</p>
+        <div class="price-amount">₹6,999</div>
+        <p class="price-period">per month · 1 location</p>
+        <ul class="price-features">
+          <li>RecipeIQ — live recipe costing</li>
+          <li>MenuOS — menu engineering</li>
+          <li>Petpooja + Posist integration</li>
+          <li>MCX/APMC commodity feed</li>
+          <li>Email support</li>
+        </ul>
+        <a href="#cta" class="price-btn">Start free trial</a>
+      </div>
+
+      <div class="price-card featured reveal reveal-d2">
+        <div class="price-badge">Most popular</div>
+        <p class="price-tier">Studio</p>
+        <div class="price-amount">₹16,999</div>
+        <p class="price-period">per month · up to 5 locations</p>
+        <ul class="price-features">
+          <li>All 4 modules included</li>
+          <li>SupplierIQ + AI negotiation briefs</li>
+          <li>SafeShield + IoT sensors</li>
+          <li>FSSAI compliance automation</li>
+          <li>Priority support + onboarding</li>
+          <li>Cross-outlet benchmarking</li>
+        </ul>
+        <a href="#cta" class="price-btn">Start free trial</a>
+      </div>
+
+      <div class="price-card reveal reveal-d3">
+        <p class="price-tier">Chain</p>
+        <div class="price-amount">₹32,999</div>
+        <p class="price-period">per month · up to 15 locations</p>
+        <ul class="price-features">
+          <li>Everything in Studio</li>
+          <li>REST API access</li>
+          <li>Supplier marketplace access</li>
+          <li>Market intelligence reports</li>
+          <li>Dedicated CSM</li>
+        </ul>
+        <a href="#cta" class="price-btn">Talk to sales</a>
+      </div>
+
+      <div class="price-card reveal reveal-d4">
+        <p class="price-tier">Enterprise</p>
+        <div class="price-amount" style="font-size:1.8rem">Custom</div>
+        <p class="price-period">15+ locations · QSR / hotel F&B</p>
+        <ul class="price-features">
+          <li>Everything in Chain</li>
+          <li>White-label option</li>
+          <li>Custom AI model tuning</li>
+          <li>SLA guarantee</li>
+          <li>On-site implementation</li>
+        </ul>
+        <a href="#cta" class="price-btn">Contact us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOUNDER ─── -->
+<section id="founder" class="section">
+  <div class="container">
+    <div class="founder-inner">
+      <div class="founder-portrait reveal">
+        <div class="portrait-frame">
+          <div class="portrait-initials">UV</div>
+          <svg class="portrait-leaf" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="70" cy="70" rx="65" ry="65" fill="var(--forest)"/><path d="M70 120 C70 120 30 95 30 55 C30 32 48 20 70 20 C92 20 110 32 110 55 C110 95 70 120 70 120Z" fill="var(--sage)" opacity=".6"/></svg>
+          <!-- Subtle herb pattern -->
+          <div style="position:absolute;inset:0;display:flex;flex-wrap:wrap;opacity:.05;align-content:flex-start;padding:1rem;gap:.5rem">
+            <svg width="20" height="28" viewBox="0 0 20 28" fill="var(--forest)"><ellipse cx="10" cy="10" rx="8" ry="10"/><line x1="10" y1="18" x2="10" y2="28" stroke="var(--forest)" stroke-width="1"/></svg>
+            <svg width="20" height="28" viewBox="0 0 20 28" fill="var(--forest)"><ellipse cx="10" cy="10" rx="8" ry="10"/><line x1="10" y1="18" x2="10" y2="28" stroke="var(--forest)" stroke-width="1"/></svg>
+            <svg width="20" height="28" viewBox="0 0 20 28" fill="var(--forest)"><ellipse cx="10" cy="10" rx="8" ry="10"/><line x1="10" y1="18" x2="10" y2="28" stroke="var(--forest)" stroke-width="1"/></svg>
+            <svg width="20" height="28" viewBox="0 0 20 28" fill="var(--forest)"><ellipse cx="10" cy="10" rx="8" ry="10"/><line x1="10" y1="18" x2="10" y2="28" stroke="var(--forest)" stroke-width="1"/></svg>
+            <svg width="20" height="28" viewBox="0 0 20 28" fill="var(--forest)"><ellipse cx="10" cy="10" rx="8" ry="10"/><line x1="10" y1="18" x2="10" y2="28" stroke="var(--forest)" stroke-width="1"/></svg>
+          </div>
+        </div>
+        <div class="founder-badge-row">
+          <span class="founder-badge">Founder & CEO</span>
+          <span class="founder-badge">F&B Operations</span>
+          <span class="founder-badge">SaaS</span>
+          <span class="founder-badge">Mumbai</span>
+        </div>
+      </div>
+
+      <div class="founder-info reveal reveal-d2">
+        <span class="label" style="color:var(--terra)">The founder</span>
+        <h2 class="founder-name">Utkarsh<br/>Varman</h2>
+        <p class="founder-title">Founder & CEO, Propela</p>
+        <div class="founder-quote">
+          "Indian food businesses have extraordinary food. What they lack is extraordinary data. Propela exists to give every operator the same margin intelligence that the largest chains keep to themselves."
+        </div>
+        <p class="founder-bio">
+          Utkarsh Varman founded Propela after seeing firsthand how the information asymmetry between suppliers, operators, and the market was silently bleeding restaurants dry. With a background spanning F&B operations and enterprise software, he built Propela to be the platform he wished had existed: one that speaks the language of a kitchen team, but thinks in the language of a CFO.
+        </p>
+        <p class="founder-bio">
+          Propela's design philosophy — deep workflow integration over surface-level dashboards — comes directly from Utkarsh's conviction that software that lives in daily operations compounds in value in ways that standalone analytics tools never can.
+        </p>
+        <div class="founder-social">
+          <a href="#" class="soc-btn" aria-label="LinkedIn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
+          <a href="#" class="soc-btn" aria-label="Twitter/X">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4l16 16M4 20L20 4"/></svg>
+          </a>
+          <a href="#" class="soc-btn" aria-label="Email">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA ─── -->
+<section id="cta">
+  <div class="container">
+    <div class="reveal" style="text-align:center">
+      <div class="section-eyebrow" style="justify-content:center"><div class="eyebrow-line" style="background:rgba(212,168,78,.35)"></div><span class="label" style="color:rgba(247,242,232,.35)">Early access open now</span><div class="eyebrow-line" style="background:rgba(212,168,78,.35)"></div></div>
+      <h2 class="display display-lg" style="color:var(--cream);margin-top:.75rem">Ready to see every<br/><em>margin leak — and fix it?</em></h2>
+      <p>Join the early access cohort. Free 90-day pilot for design partners. Weekly commodity intelligence from day one.</p>
+      <div class="cta-actions">
+        <a href="#" class="btn-wheat">
+          Apply for early access
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="mailto:hello@propela.ai" class="btn-outline-light">Email us at hello@propela.ai</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-logo">Propela</div>
+        <p class="footer-tagline">The operating system for food businesses. Recipe costing, menu engineering, supplier intelligence, and compliance — unified.</p>
+        <p style="font-size:.75rem;color:rgba(247,242,232,.2);margin-top:1rem">Mumbai, India &nbsp;·&nbsp; hello@propela.ai</p>
+      </div>
+      <div class="footer-col">
+        <h5>Product</h5>
+        <a href="#modules">RecipeIQ</a>
+        <a href="#modules">MenuOS</a>
+        <a href="#modules">SupplierIQ</a>
+        <a href="#modules">SafeShield</a>
+        <a href="#pricing">Pricing</a>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <a href="#founder">About & founder</a>
+        <a href="#how">Integrations</a>
+        <a href="#cta">Early access</a>
+        <a href="#">F&B Margin newsletter</a>
+      </div>
+      <div class="footer-col">
+        <h5>Resources</h5>
+        <a href="#">Case studies</a>
+        <a href="#">ROI calculator</a>
+        <a href="#">FSSAI compliance guide</a>
+        <a href="#">MCX/APMC data glossary</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-brand">© 2025 Propela · Built for India's F&B industry</span>
+      <span>Founded by Utkarsh Varman</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ─── SCROLL PROGRESS ─── */
+window.addEventListener('scroll',()=>{
+  const d=document.documentElement;
+  const p=(d.scrollTop/(d.scrollHeight-d.clientHeight))*100;
+  document.getElementById('progress-bar').style.width=p+'%';
+  document.getElementById('nav').classList.toggle('scrolled',d.scrollTop>60);
+});
+
+/* ─── REVEAL ON SCROLL ─── */
+const reveals=document.querySelectorAll('.reveal');
+const ro=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');ro.unobserve(e.target);}});
+},{threshold:.12});
+reveals.forEach(r=>ro.observe(r));
+
+/* ─── ANIMATED COUNTERS ─── */
+function animateCount(id,end,suffix,duration=1800){
+  const el=document.getElementById(id);
+  if(!el)return;
+  let start=0,startTime=null;
+  function step(ts){
+    if(!startTime)startTime=ts;
+    const p=Math.min((ts-startTime)/duration,1);
+    const ease=1-Math.pow(1-p,3);
+    el.textContent=Math.round(ease*end)+suffix;
+    if(p<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+const heroObs=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      setTimeout(()=>animateCount('s1',38,'%'),200);
+      setTimeout(()=>animateCount('s2',18,'%'),400);
+      setTimeout(()=>animateCount('s3',22,'%'),600);
+      setTimeout(()=>animateCount('s4',8,'.8×'),800);
+      heroObs.disconnect();
+    }
+  });
+},{threshold:.3});
+const heroStats=document.querySelector('.hero-stats');
+if(heroStats)heroObs.observe(heroStats);
+
+/* ─── BAR CHART ANIMATION ─── */
+function animateBars(){
+  document.querySelectorAll('.chart-bar[data-w]').forEach(bar=>{
+    const target=bar.getAttribute('data-w');
+    setTimeout(()=>{bar.style.width=target;},300);
+  });
+}
+const chartObs=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting){animateBars();chartObs.disconnect();}});
+},{threshold:.3});
+const miniChart=document.querySelector('.mini-chart');
+if(miniChart)chartObs.observe(miniChart);
+
+/* ─── MODULE TABS ─── */
+function switchModule(id,btn){
+  document.querySelectorAll('.module-panel').forEach(p=>{p.classList.remove('active');});
+  document.querySelectorAll('.mod-tab').forEach(b=>{b.classList.remove('active');});
+  const panel=document.getElementById('mod-'+id);
+  if(panel){
+    panel.classList.add('active');
+    panel.querySelectorAll('.chart-bar[data-w]').forEach(b=>{b.style.width='0%';});
+    setTimeout(()=>{panel.querySelectorAll('.chart-bar[data-w]').forEach(b=>{b.style.width=b.getAttribute('data-w');});},200);
+  }
+  btn.classList.add('active');
+}
+
+/* ─── LIVE CALC ─── */
+const revSlider=document.getElementById('rev-slider');
+const outSlider=document.getElementById('out-slider');
+function updateCalc(){
+  const rev=parseInt(revSlider.value);
+  const out=parseInt(outSlider.value);
+  document.getElementById('rev-val').textContent='₹'+rev+'L';
+  document.getElementById('out-val').textContent=out;
+  const saving=(rev*out*12*0.01*0.5)+(rev*out*12*0.002);
+  const savingL=Math.round(saving*10)/10;
+  document.getElementById('calc-result').textContent='₹'+savingL.toFixed(1)+'L';
+}
+if(revSlider){revSlider.addEventListener('input',updateCalc);outSlider.addEventListener('input',updateCalc);updateCalc();}
+
+/* ─── TICKER duplicate fix ─── */
+const track=document.getElementById('ticker');
+if(track){
+  const clone=track.innerHTML;
+  track.innerHTML=clone+clone;
+}
+</script>
+</body>
+</html>
